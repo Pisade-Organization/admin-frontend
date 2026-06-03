@@ -18,15 +18,19 @@ export default async function Home() {
       redirect('/auth/signout?callbackUrl=/');
     }
 
-    if (!isAdminAuthError(error)) {
-      return (
-        <main className="flex min-h-screen items-center justify-center bg-stone-100 px-4 py-12">
-          <div className="w-full max-w-2xl">
-            <AdminPageErrorState description="The admin shell could not verify the current session. Check backend connectivity and try again." />
-          </div>
-        </main>
-      );
-    }
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-stone-100 px-4 py-12">
+        <div className="w-full max-w-2xl">
+          <AdminPageErrorState
+            description={
+              error instanceof Error && error.message.trim()
+                ? error.message
+                : 'The admin shell could not verify the current session. Check backend connectivity and try again.'
+            }
+          />
+        </div>
+      </main>
+    );
   }
 
   return (

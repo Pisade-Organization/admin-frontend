@@ -81,11 +81,26 @@ export async function fetchAdminApi<T>(
     headers.set('Authorization', `Bearer ${accessToken}`);
   }
 
-  const response = await fetch(`${getBackendBaseUrl()}${path}`, {
-    ...init,
-    headers,
-    cache: 'no-store',
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(`${getBackendBaseUrl()}${path}`, {
+      ...init,
+      headers,
+      cache: 'no-store',
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error && error.message.trim()
+        ? error.message
+        : 'Backend request failed before a response was received.';
+
+    throw createAdminApiError({
+      message,
+      status: 503,
+      code: 'ADMIN_BACKEND_UNREACHABLE',
+    });
+  }
 
   if (!response.ok) {
     throw createAdminApiError({
@@ -125,14 +140,19 @@ export async function getAdminShellUser(
     refreshAccessToken?: () => Promise<string | null>;
   } = {},
 ) {
-  return resolveAdminShellUser({
-    getAccessToken: deps.getAccessToken ?? getAdminAccessToken,
-    fetchProfile:
-      deps.fetchProfile ??
-      ((accessToken) =>
-        fetchAdminApi<AdminProfileResponse>('/v1/me', undefined, accessToken)),
-    refreshAccessToken: deps.refreshAccessToken ?? refreshAdminAccessToken,
-  });
+  try {
+    return await resolveAdminShellUser({
+      getAccessToken: deps.getAccessToken ?? getAdminAccessToken,
+      fetchProfile:
+        deps.fetchProfile ??
+        ((accessToken) =>
+          fetchAdminApi<AdminProfileResponse>('/v1/me', undefined, accessToken)),
+      refreshAccessToken: deps.refreshAccessToken ?? refreshAdminAccessToken,
+    });
+  } catch (error) {
+    logAdminShellError('getAdminShellUser', error);
+    throw error;
+  }
 }
 
 async function refreshAdminAccessToken() {
@@ -175,6 +195,21 @@ async function refreshAdminAccessToken() {
   }
 
   return null;
+}
+
+function logAdminShellError(scope: string, error: unknown) {
+  const details =
+    error instanceof Error
+      ? {
+          name: error.name,
+          message: error.message,
+          stack: error.stack,
+          status: error instanceof AdminApiError ? error.status : undefined,
+          code: error instanceof AdminApiError ? error.code : undefined,
+        }
+      : { value: error };
+
+  console.error(`[admin] ${scope} failed`, details);
 }
 
 async function getApiErrorMessage(response: Response) {
