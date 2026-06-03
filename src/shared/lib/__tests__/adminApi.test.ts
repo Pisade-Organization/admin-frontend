@@ -36,3 +36,29 @@ test('returns null shell user when token is missing', async () => {
 
   assert.equal(result, null);
 });
+
+test('refreshes the shell user when the access token is missing but refresh succeeds', async () => {
+  let profileCalls = 0;
+
+  const result = await resolveAdminShellUser({
+    getAccessToken: async () => null,
+    refreshAccessToken: async () => 'fresh-access-token',
+    fetchProfile: async (accessToken) => {
+      profileCalls += 1;
+      assert.equal(accessToken, 'fresh-access-token');
+      return {
+        id: 'user-1',
+        email: 'admin@example.com',
+        fullName: 'Admin User',
+        avatarUrl: null,
+      };
+    },
+  });
+
+  assert.equal(profileCalls, 1);
+  assert.deepEqual(result, {
+    name: 'Admin User',
+    email: 'admin@example.com',
+    avatarSrc: null,
+  });
+});

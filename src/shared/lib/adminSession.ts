@@ -67,16 +67,33 @@ export function normalizeAdminShellUser(
 export async function resolveAdminShellUser(
   deps: {
     getAccessToken: () => Promise<string | null>;
-    fetchProfile: () => Promise<AdminProfileResponse>;
+    fetchProfile: (accessToken?: string | null) => Promise<AdminProfileResponse>;
+    refreshAccessToken?: () => Promise<string | null>;
   },
 ): Promise<AdminShellUser | null> {
   const accessToken = await deps.getAccessToken();
 
-  if (!accessToken) {
+  if (accessToken) {
+    try {
+      return normalizeAdminShellUser(await deps.fetchProfile(accessToken));
+    } catch (error) {
+      if (!deps.refreshAccessToken) {
+        throw error;
+      }
+    }
+  }
+
+  if (!deps.refreshAccessToken) {
     return null;
   }
 
-  const profile = await deps.fetchProfile();
+  const refreshedAccessToken = await deps.refreshAccessToken();
+
+  if (!refreshedAccessToken) {
+    return null;
+  }
+
+  const profile = await deps.fetchProfile(refreshedAccessToken);
 
   return normalizeAdminShellUser(profile);
 }

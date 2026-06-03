@@ -22,6 +22,7 @@ type ApiResponse<T> = {
 export function getBackendBaseUrl() {
   return (
     process.env.NEXT_PUBLIC_BACKEND_URL ||
+    process.env.NEXT_PUBLIC_API_URL ||
     process.env.BACKEND_URL ||
     'http://localhost:4000'
   );
@@ -43,8 +44,9 @@ export async function getAdminAccessToken() {
 export async function fetchAdminApi<T>(
   path: string,
   init?: RequestInit,
+  accessTokenOverride?: string | null,
 ): Promise<T> {
-  const accessToken = await getAdminAccessToken();
+  const accessToken = accessTokenOverride ?? (await getAdminAccessToken());
   const headers = new Headers(init?.headers);
 
   headers.set('Accept', 'application/json');
@@ -97,14 +99,64 @@ export async function fetchPublicApi<T>(path: string): Promise<T> {
 export async function getAdminShellUser(
   deps: {
     getAccessToken?: () => Promise<string | null>;
-    fetchProfile?: () => Promise<AdminProfileResponse>;
+    fetchProfile?: (accessToken?: string | null) => Promise<AdminProfileResponse>;
+    refreshAccessToken?: () => Promise<string | null>;
   } = {},
 ) {
   return resolveAdminShellUser({
     getAccessToken: deps.getAccessToken ?? getAdminAccessToken,
     fetchProfile:
-      deps.fetchProfile ?? (() => fetchAdminApi<AdminProfileResponse>('/v1/me')),
+      deps.fetchProfile ??
+      ((accessToken) =>
+        fetchAdminApi<AdminProfileResponse>('/v1/me', undefined, accessToken)),
+    refreshAccessToken: deps.refreshAccessToken ?? refreshAdminAccessToken,
   });
+}
+
+async function refreshAdminAccessToken() {
+  const refreshToken = await getAdminRefreshToken();
+
+  if (!refreshToken) {
+    return null;
+  }
+
+  const response = await fetch(`${getBackendBaseUrl()}/auth/refresh`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Bearer ${refreshToken}`,
+    },
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    throw createAdminApiError({
+      message: await getApiErrorMessage(response),
+      status: response.status,
+    });
+  }
+
+  const payload = (await response.json()) as
+    | { success?: boolean; data?: { access_token?: string } }
+    | { access_token?: string };
+
+  const data = 'data' in payload ? payload.data : payload;
+  const accessToken = data?.access_token?.trim();
+
+  return accessToken || null;
+}
+
+async function getAdminRefreshToken() {
+  const requestHeaders = await headers();
+  const cookieStore = await cookies();
+
+  return (
+    requestHeaders.get('x-admin-refresh-token') ||
+    cookieStore.get('refreshToken')?.value ||
+    cookieStore.get('refresh_token')?.value ||
+    process.env.ADMIN_REFRESH_TOKEN ||
+    null
+  );
 }
 
 async function getApiErrorMessage(response: Response) {
