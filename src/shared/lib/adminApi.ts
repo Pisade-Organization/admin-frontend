@@ -71,6 +71,14 @@ export async function fetchAdminApi<T>(
 ): Promise<T> {
   const accessToken = accessTokenOverride ?? (await getAdminAccessToken());
   const headers = new Headers(init?.headers);
+  const method = init?.method?.toUpperCase() || 'GET';
+  const url = `${getBackendBaseUrl()}${path}`;
+
+  console.info(`[admin] fetchAdminApi start`, {
+    url,
+    method,
+    hasAccessToken: Boolean(accessToken),
+  });
 
   headers.set('Accept', 'application/json');
 
@@ -85,7 +93,7 @@ export async function fetchAdminApi<T>(
   let response: Response;
 
   try {
-    response = await fetch(`${getBackendBaseUrl()}${path}`, {
+    response = await fetch(url, {
       ...init,
       headers,
       cache: 'no-store',
@@ -96,10 +104,11 @@ export async function fetchAdminApi<T>(
         ? error.message
         : 'Backend request failed before a response was received.';
 
-    logAdminRequestFailure('fetchAdminApi', `${getBackendBaseUrl()}${path}`, {
+    logAdminRequestFailure('fetchAdminApi', url, {
       message,
       error,
       hasAccessToken: Boolean(accessToken),
+      method,
     });
 
     throw createAdminApiError({
@@ -110,10 +119,11 @@ export async function fetchAdminApi<T>(
   }
 
   if (!response.ok) {
-    logAdminRequestFailure('fetchAdminApi', `${getBackendBaseUrl()}${path}`, {
+    logAdminRequestFailure('fetchAdminApi', url, {
       status: response.status,
       message: await getApiErrorMessage(response),
       hasAccessToken: Boolean(accessToken),
+      method,
     });
 
     throw createAdminApiError({
@@ -123,11 +133,20 @@ export async function fetchAdminApi<T>(
   }
 
   const payload = (await response.json()) as ApiResponse<T>;
+  console.info(`[admin] fetchAdminApi success`, {
+    url,
+    method,
+    status: response.status,
+    hasAccessToken: Boolean(accessToken),
+  });
   return payload.data;
 }
 
 export async function fetchPublicApi<T>(path: string): Promise<T> {
-  const response = await fetch(`${getBackendBaseUrl()}${path}`, {
+  const url = `${getBackendBaseUrl()}${path}`;
+  console.info(`[admin] fetchPublicApi start`, { url, method: 'GET' });
+
+  const response = await fetch(url, {
     cache: 'no-store',
     headers: {
       Accept: 'application/json',
@@ -135,6 +154,12 @@ export async function fetchPublicApi<T>(path: string): Promise<T> {
   });
 
   if (!response.ok) {
+    logAdminRequestFailure('fetchPublicApi', url, {
+      status: response.status,
+      message: await getApiErrorMessage(response),
+      method: 'GET',
+    });
+
     throw createAdminApiError({
       message: await getApiErrorMessage(response),
       status: response.status,
@@ -143,6 +168,11 @@ export async function fetchPublicApi<T>(path: string): Promise<T> {
   }
 
   const payload = (await response.json()) as ApiResponse<T>;
+  console.info(`[admin] fetchPublicApi success`, {
+    url,
+    method: 'GET',
+    status: response.status,
+  });
   return payload.data;
 }
 
