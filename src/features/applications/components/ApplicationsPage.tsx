@@ -25,6 +25,7 @@ type ApplicationsPageProps = {
   searchParams: ApplicationsSearchParams;
 };
 
+// HI
 const visibleStatuses: TutorStatus[] = ['REVIEWING', 'APPROVED', 'REJECTED', 'SUSPENDED'];
 
 function getStatusUpdatePath(tutorId: string, nextStatus: string) {

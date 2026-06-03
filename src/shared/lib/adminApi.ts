@@ -140,8 +140,9 @@ async function refreshAdminAccessToken() {
     | { success?: boolean; data?: { access_token?: string } }
     | { access_token?: string };
 
-  const data = 'data' in payload ? payload.data : payload;
-  const accessToken = data?.access_token?.trim();
+  const accessToken = 'data' in payload
+    ? payload.data?.access_token?.trim()
+    : payload.access_token?.trim();
 
   return accessToken || null;
 }
