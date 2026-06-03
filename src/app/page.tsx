@@ -1,16 +1,7 @@
-import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import AdminGoogleSignInButton from '@/app/AdminGoogleSignInButton';
 import { AdminPageErrorState, AdminStateCard } from '@/shared/components/admin-state';
 import { getAdminShellUser, isAdminAuthError } from '@/shared/lib/adminApi';
-
-function getSignInHref() {
-  const backendUrl =
-    process.env.NEXT_PUBLIC_BACKEND_URL ||
-    process.env.BACKEND_URL ||
-    'http://localhost:4000';
-
-  return `${backendUrl}/auth/google/signin?target=admin`;
-}
 
 export default async function Home() {
   try {
@@ -38,14 +29,7 @@ export default async function Home() {
           tone="warning"
           title="Admin session required"
           description="This dashboard only renders for authenticated admin or manager sessions. Sign in first, then return to continue."
-          action={
-            <Link
-              href={getSignInHref()}
-              className="inline-flex rounded-2xl bg-deep-royal-indigo-500 px-4 py-3 text-label-3 text-white"
-            >
-              Continue with Google
-            </Link>
-          }
+          action={<AdminGoogleSignInButton />}
         />
       </div>
     </main>
