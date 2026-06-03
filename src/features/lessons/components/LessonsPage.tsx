@@ -131,8 +131,10 @@ const statusOptions: LessonStatus[] = [
 ];
 
 function normalizeStatus(value?: string): LessonStatus {
-  return statusOptions.includes((value ?? 'ALL') as LessonStatus)
-    ? (value as LessonStatus)
+  const normalized = value?.trim();
+
+  return normalized && statusOptions.includes(normalized as LessonStatus)
+    ? (normalized as LessonStatus)
     : 'ALL';
 }
 

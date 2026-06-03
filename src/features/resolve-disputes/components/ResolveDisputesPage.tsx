@@ -56,8 +56,10 @@ type ResolveDisputesPageProps = {
 const statusOptions: DisputeStatus[] = ['OPEN', 'BLOCKED', 'ALL'];
 
 function normalizeStatus(value?: string): DisputeStatus {
-  return statusOptions.includes((value ?? 'OPEN') as DisputeStatus)
-    ? (value as DisputeStatus)
+  const normalized = value?.trim();
+
+  return normalized && statusOptions.includes(normalized as DisputeStatus)
+    ? (normalized as DisputeStatus)
     : 'OPEN';
 }
 

@@ -92,8 +92,10 @@ const statusOptions: TutorStatus[] = [
 ];
 
 function normalizeStatus(value?: string): TutorStatus {
-  return statusOptions.includes((value ?? 'ALL') as TutorStatus)
-    ? (value as TutorStatus)
+  const normalized = value?.trim();
+
+  return normalized && statusOptions.includes(normalized as TutorStatus)
+    ? (normalized as TutorStatus)
     : 'ALL';
 }
 

@@ -66,8 +66,10 @@ const statusOptions: StudentStatus[] = [
 ];
 
 function normalizeStatus(value?: string): StudentStatus {
-  return statusOptions.includes((value ?? 'ALL') as StudentStatus)
-    ? (value as StudentStatus)
+  const normalized = value?.trim();
+
+  return normalized && statusOptions.includes(normalized as StudentStatus)
+    ? (normalized as StudentStatus)
     : 'ALL';
 }
 
