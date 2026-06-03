@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { headers } from 'next/headers';
 import {
   type AdminProfileResponse,
   createAdminApiError,
@@ -27,9 +28,11 @@ export function getBackendBaseUrl() {
 }
 
 export async function getAdminAccessToken() {
+  const requestHeaders = await headers();
   const cookieStore = await cookies();
 
   return (
+    requestHeaders.get('x-admin-access-token') ||
     cookieStore.get('accessToken')?.value ||
     cookieStore.get('access_token')?.value ||
     process.env.ADMIN_ACCESS_TOKEN ||

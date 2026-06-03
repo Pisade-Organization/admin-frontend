@@ -1,28 +1,8 @@
 import { NextResponse } from 'next/server';
+import { applyAdminSessionCookies } from '@/shared/lib/adminSessionCookies';
 
 function buildRedirectUrl(request: Request) {
   return new URL('/overview', request.url);
-}
-
-function applySessionCookies(
-  response: NextResponse,
-  accessToken: string,
-  refreshToken: string,
-) {
-  const secure = process.env.NODE_ENV === 'production';
-
-  response.cookies.set('accessToken', accessToken, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure,
-    path: '/',
-  });
-  response.cookies.set('refreshToken', refreshToken, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure,
-    path: '/',
-  });
 }
 
 export async function GET(request: Request) {
@@ -37,7 +17,7 @@ export async function GET(request: Request) {
   }
 
   const response = NextResponse.redirect(redirectUrl);
-  applySessionCookies(response, accessToken, refreshToken);
+  applyAdminSessionCookies(response, accessToken, refreshToken);
 
   return response;
 }
@@ -61,7 +41,7 @@ export async function POST(request: Request) {
   }
 
   const response = NextResponse.json({ success: true });
-  applySessionCookies(response, accessToken, refreshToken);
+  applyAdminSessionCookies(response, accessToken, refreshToken);
 
   return response;
 }
