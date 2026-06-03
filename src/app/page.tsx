@@ -1,16 +1,26 @@
 import { redirect } from 'next/navigation';
 import AdminGoogleSignInButton from '@/app/AdminGoogleSignInButton';
 import { AdminPageErrorState, AdminStateCard } from '@/shared/components/admin-state';
-import { getAdminShellUser, isAdminAuthError } from '@/shared/lib/adminApi';
+import {
+  getAdminShellUser,
+  hasAdminSessionTokens,
+  isAdminAuthError,
+} from '@/shared/lib/adminApi';
 
 export default async function Home() {
+  const hasSession = await hasAdminSessionTokens();
+
   try {
     const shellUser = await getAdminShellUser();
 
-    if (shellUser) {
+    if (shellUser || hasSession) {
       redirect('/overview');
     }
   } catch (error) {
+    if (hasSession) {
+      redirect('/overview');
+    }
+
     if (!isAdminAuthError(error)) {
       return (
         <main className="flex min-h-screen items-center justify-center bg-stone-100 px-4 py-12">

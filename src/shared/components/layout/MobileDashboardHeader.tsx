@@ -23,7 +23,7 @@ import type { AdminShellUser } from "@/shared/lib/adminSession";
 
 type MobileDashboardHeaderProps = {
   items: SidebarItem[];
-  user: AdminShellUser;
+  user: AdminShellUser | null;
 };
 
 const iconMap = {
@@ -55,6 +55,10 @@ export default function MobileDashboardHeader({
       document.body.style.overflow = previousOverflow;
     };
   }, [isOpen]);
+
+  const userName = user?.name ?? "Admin";
+  const userEmail = user?.email ?? "Session available";
+  const userInitial = userName.charAt(0).toUpperCase();
 
   const notificationButton = (
     <button
@@ -175,25 +179,25 @@ export default function MobileDashboardHeader({
             </nav>
 
             <div className="flex items-center gap-[10px] rounded-[8px] border border-deep-royal-indigo-400 px-3 py-[10px]">
-              {user.avatarSrc ? (
+              {user?.avatarSrc ? (
                 <Image
                   width={36}
                   height={36}
                   src={user.avatarSrc}
-                  alt={user.name}
+                  alt={userName}
                   className="rounded-full"
                 />
               ) : (
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-deep-royal-indigo-400 text-label-3 text-white">
-                  {user.name.charAt(0).toUpperCase()}
+                  {userInitial}
                 </div>
               )}
               <div className="flex flex-1 flex-col">
                 <Typography variant="label-3" className="text-white/50">
-                  {user.name}
+                  {userName}
                 </Typography>
                 <Typography variant="body-4" className="text-white/70">
-                  {user.email}
+                  {userEmail}
                 </Typography>
               </div>
               <Ellipsis className="h-4 w-4 text-deep-royal-indigo-50" />

@@ -41,6 +41,28 @@ export async function getAdminAccessToken() {
   );
 }
 
+export async function getAdminRefreshToken() {
+  const requestHeaders = await headers();
+  const cookieStore = await cookies();
+
+  return (
+    requestHeaders.get('x-admin-refresh-token') ||
+    cookieStore.get('refreshToken')?.value ||
+    cookieStore.get('refresh_token')?.value ||
+    process.env.ADMIN_REFRESH_TOKEN ||
+    null
+  );
+}
+
+export async function hasAdminSessionTokens() {
+  const [accessToken, refreshToken] = await Promise.all([
+    getAdminAccessToken(),
+    getAdminRefreshToken(),
+  ]);
+
+  return Boolean(accessToken || refreshToken);
+}
+
 export async function fetchAdminApi<T>(
   path: string,
   init?: RequestInit,
@@ -153,19 +175,6 @@ async function refreshAdminAccessToken() {
   }
 
   return null;
-}
-
-async function getAdminRefreshToken() {
-  const requestHeaders = await headers();
-  const cookieStore = await cookies();
-
-  return (
-    requestHeaders.get('x-admin-refresh-token') ||
-    cookieStore.get('refreshToken')?.value ||
-    cookieStore.get('refresh_token')?.value ||
-    process.env.ADMIN_REFRESH_TOKEN ||
-    null
-  );
 }
 
 async function getApiErrorMessage(response: Response) {
