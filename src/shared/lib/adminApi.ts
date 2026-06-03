@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { headers } from 'next/headers';
 import {
+  AdminApiError,
   type AdminProfileResponse,
   createAdminApiError,
   resolveAdminShellUser,
