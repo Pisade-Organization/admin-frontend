@@ -49,7 +49,7 @@ export type ApplicationsSearchParams = {
 };
 
 export function getBackendBaseUrl() {
-  return process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL || 'http://localhost:4000';
+  return process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
 }
 
 export function parseApplicationStatus(value?: string): TutorStatus {

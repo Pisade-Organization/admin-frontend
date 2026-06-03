@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
+import { MoreHorizontal } from 'lucide-react';
 import Avatar from '@/shared/components/base/Avatar';
 import Typography from '@/shared/components/base/Typography';
 import AdminEmptyState from '@/shared/components/admin/AdminEmptyState';
@@ -130,6 +131,7 @@ function buildTutorsPath(params: TutorsPageSearchParams) {
 
 export async function TutorsPage({ searchParams = {} }: TutorsPageProps) {
   const status = normalizeStatus(searchParams.status);
+  const isRestrictedTab = status === 'SUSPENDED';
   const q = searchParams.q?.trim() ?? '';
   const page = parsePage(searchParams.page);
   const flashMessage = getAdminFlashMessage(searchParams);
@@ -315,6 +317,8 @@ export async function TutorsPage({ searchParams = {} }: TutorsPageProps) {
               });
               const nextStatus =
                 tutor.status === 'SUSPENDED' ? 'APPROVED' : 'SUSPENDED';
+              const showRestrictedRestoreMenu =
+                isRestrictedTab && tutor.status === 'SUSPENDED';
 
               return (
                 <article
@@ -345,11 +349,34 @@ export async function TutorsPage({ searchParams = {} }: TutorsPageProps) {
                         </Typography>
                       </div>
                     </div>
-                    <span
-                      className={`rounded-full px-3 py-1 text-label-4 ${getStatusTone(tutor.status)}`}
-                    >
-                      {formatStatusLabel(tutor.status)}
-                    </span>
+                    <div className="flex items-start gap-2">
+                      <span
+                        className={`rounded-full px-3 py-1 text-label-4 ${getStatusTone(tutor.status)}`}
+                      >
+                        {formatStatusLabel(tutor.status)}
+                      </span>
+                      {showRestrictedRestoreMenu ? (
+                        <details className="relative">
+                          <summary className="flex h-9 w-9 cursor-pointer list-none items-center justify-center rounded-full border border-neutral-100 bg-white text-neutral-600 transition hover:border-deep-royal-indigo-100 hover:text-deep-royal-indigo-500 [&::-webkit-details-marker]:hidden">
+                            <span className="sr-only">Open tutor actions</span>
+                            <MoreHorizontal size={18} />
+                          </summary>
+                          <div className="absolute right-0 top-11 z-10 w-52 rounded-[20px] border border-stone-200 bg-white p-2 shadow-[0_16px_40px_rgba(12,10,24,0.12)]">
+                            <form action={updateTutorStatus}>
+                              <input type="hidden" name="tutorId" value={tutor.id} />
+                              <input type="hidden" name="status" value="APPROVED" />
+                              <input type="hidden" name="returnTo" value={returnTo} />
+                              <button
+                                type="submit"
+                                className="w-full rounded-2xl px-4 py-3 text-left text-label-3 text-neutral-800 transition hover:bg-neutral-25"
+                              >
+                                Change to approved
+                              </button>
+                            </form>
+                          </div>
+                        </details>
+                      ) : null}
+                    </div>
                   </div>
 
                   <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -445,19 +472,21 @@ export async function TutorsPage({ searchParams = {} }: TutorsPageProps) {
                         </button>
                       </form>
 
-                      <form action={updateTutorStatus}>
-                        <input type="hidden" name="tutorId" value={tutor.id} />
-                        <input type="hidden" name="status" value={nextStatus} />
-                        <input type="hidden" name="returnTo" value={returnTo} />
-                        <button
-                          type="submit"
-                          className="rounded-2xl bg-deep-royal-indigo-500 px-4 py-3 text-label-3 text-white"
-                        >
-                          {tutor.status === 'SUSPENDED'
-                            ? 'Re-approve'
-                            : 'Suspend'}
-                        </button>
-                      </form>
+                      {!showRestrictedRestoreMenu ? (
+                        <form action={updateTutorStatus}>
+                          <input type="hidden" name="tutorId" value={tutor.id} />
+                          <input type="hidden" name="status" value={nextStatus} />
+                          <input type="hidden" name="returnTo" value={returnTo} />
+                          <button
+                            type="submit"
+                            className="rounded-2xl bg-deep-royal-indigo-500 px-4 py-3 text-label-3 text-white"
+                          >
+                            {tutor.status === 'SUSPENDED'
+                              ? 'Re-approve'
+                              : 'Suspend'}
+                          </button>
+                        </form>
+                      ) : null}
                     </div>
                   </div>
                 </article>
