@@ -1,0 +1,199 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wdth,wght@62.5..100,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rethink+Sans:ital,wght@0,400..800;1,400..800&display=swap');
+
+@import "tailwindcss";
+
+/* Safelist: dynamic typography classes with responsive variants */
+@source inline("text-{headline-1,headline-2,headline-3,headline-4,headline-5,title-1,title-2,title-3,title-4,label-1,label-2,label-3,label-4,body-1,body-2,body-3,body-4}");
+@source inline("sm:text-{headline-1,headline-2,headline-3,headline-4,headline-5,title-1,title-2,title-3,title-4,label-1,label-2,label-3,label-4,body-1,body-2,body-3,body-4}");
+@source inline("md:text-{headline-1,headline-2,headline-3,headline-4,headline-5,title-1,title-2,title-3,title-4,label-1,label-2,label-3,label-4,body-1,body-2,body-3,body-4}");
+@source inline("lg:text-{headline-1,headline-2,headline-3,headline-4,headline-5,title-1,title-2,title-3,title-4,label-1,label-2,label-3,label-4,body-1,body-2,body-3,body-4}");
+@source inline("xl:text-{headline-1,headline-2,headline-3,headline-4,headline-5,title-1,title-2,title-3,title-4,label-1,label-2,label-3,label-4,body-1,body-2,body-3,body-4}");
+@source inline("2xl:text-{headline-1,headline-2,headline-3,headline-4,headline-5,title-1,title-2,title-3,title-4,label-1,label-2,label-3,label-4,body-1,body-2,body-3,body-4}");
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
+  --primary: #1b0166;
+  --primary-foreground: #ffffff;
+  --secondary: #cb63fe;
+  --secondary-foreground: #ffffff;
+  --muted: #e8e6f0;
+  --muted-foreground: #454545;
+  --accent: #6d08e8;
+  --accent-foreground: #ffffff;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e5e7eb;
+  --input: #e5e7eb;
+  --ring: #6d08e8;
+  --radius: 0.5rem;
+}
+
+@theme inline {
+  --font-sans: var(--font-rethink-sans);
+  --font-thai: var(--font-noto-sans-thai);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --color-neutral-25: #f8f8f8;
+  --color-neutral-50: #efefef;
+  --color-neutral-100: #cecece;
+  --color-neutral-200: #b6b6b6;
+  --color-neutral-300: #959595;
+  --color-neutral-400: #818181;
+  --color-neutral-500: #616161;
+  --color-neutral-600: #585858;
+  --color-neutral-700: #454545;
+  --color-neutral-800: #353535;
+  --color-neutral-900: #292929;
+  --color-deep-royal-indigo-50: #e8e6f0;
+  --color-deep-royal-indigo-100: #b8b0d0;
+  --color-deep-royal-indigo-200: #968ab9;
+  --color-deep-royal-indigo-300: #665598;
+  --color-deep-royal-indigo-400: #493485;
+  --color-deep-royal-indigo-500: #1b0166;
+  --color-deep-royal-indigo-600: #19015d;
+  --color-deep-royal-indigo-700: #130148;
+  --color-deep-royal-indigo-800: #0f0138;
+  --color-deep-royal-indigo-900: #0b002b;
+  --color-radiant-lavender-50: #faefff;
+  --color-radiant-lavender-100: #efcfff;
+  --color-radiant-lavender-200: #e7b7ff;
+  --color-radiant-lavender-300: #dc96fe;
+  --color-radiant-lavender-400: #d582fe;
+  --color-radiant-lavender-500: #cb63fe;
+  --color-radiant-lavender-600: #b95ae7;
+  --color-radiant-lavender-700: #9046b4;
+  --color-radiant-lavender-800: #70368c;
+  --color-radiant-lavender-900: #552a6b;
+  --color-electric-violet-25: #fbf7fe;
+  --color-electric-violet-50: #f0e6fd;
+  --color-electric-violet-100: #d2b2f8;
+  --color-electric-violet-200: #bc8df4;
+  --color-electric-violet-300: #9d5af0;
+  --color-electric-violet-400: #8a39ed;
+  --color-electric-violet-500: #6d08e8;
+  --color-electric-violet-600: #6307d3;
+  --color-electric-violet-700: #4d06a5;
+  --color-electric-violet-800: #3c0480;
+  --color-electric-violet-900: #2e0361;
+  --color-yellow-normal: #ffb130;
+  --color-yellow-light: #ffefd6;
+  --color-orange-normal: #fc8b23;
+  --color-orange-light: #fff5eb;
+  --color-green-normal: #3ba55c;
+  --color-green-light: #effcf3;
+  --color-blue-normal: #3e70dd;
+  --color-blue-light: #eff4ff;
+  --color-violet-normal: #702dff;
+  --color-violet-light: #dcccff;
+  --color-red-normal: #ed4245;
+  --color-red-light: #fff1f2;
+  --text-headline-1: 40px;
+  --text-headline-1--line-height: 130%;
+  --text-headline-1--letter-spacing: 0;
+  --text-headline-1--font-weight: 700;
+  --text-headline-2: 32px;
+  --text-headline-2--line-height: 150%;
+  --text-headline-2--letter-spacing: 0;
+  --text-headline-2--font-weight: 700;
+  --text-headline-3: 28px;
+  --text-headline-3--line-height: 150%;
+  --text-headline-3--letter-spacing: 0;
+  --text-headline-3--font-weight: 700;
+  --text-headline-4: 24px;
+  --text-headline-4--line-height: 120%;
+  --text-headline-4--letter-spacing: 0;
+  --text-headline-4--font-weight: 700;
+  --text-headline-5: 20px;
+  --text-headline-5--line-height: 130%;
+  --text-headline-5--letter-spacing: 0;
+  --text-headline-5--font-weight: 700;
+  --text-title-1: 18px;
+  --text-title-1--line-height: 150%;
+  --text-title-1--letter-spacing: 0;
+  --text-title-1--font-weight: 700;
+  --text-title-2: 16px;
+  --text-title-2--line-height: 150%;
+  --text-title-2--letter-spacing: 0;
+  --text-title-2--font-weight: 700;
+  --text-title-3: 14px;
+  --text-title-3--line-height: 150%;
+  --text-title-3--letter-spacing: 0;
+  --text-title-3--font-weight: 700;
+  --text-title-4: 12px;
+  --text-title-4--line-height: 150%;
+  --text-title-4--letter-spacing: 0;
+  --text-title-4--font-weight: 700;
+  --text-label-1: 18px;
+  --text-label-1--line-height: 150%;
+  --text-label-1--letter-spacing: 0;
+  --text-label-1--font-weight: 500;
+  --text-label-2: 16px;
+  --text-label-2--line-height: 150%;
+  --text-label-2--letter-spacing: 0;
+  --text-label-2--font-weight: 500;
+  --text-label-3: 14px;
+  --text-label-3--line-height: 150%;
+  --text-label-3--letter-spacing: 0;
+  --text-label-3--font-weight: 500;
+  --text-label-4: 12px;
+  --text-label-4--line-height: 150%;
+  --text-label-4--letter-spacing: 0;
+  --text-label-4--font-weight: 500;
+  --text-body-1: 18px;
+  --text-body-1--line-height: 150%;
+  --text-body-1--letter-spacing: 0;
+  --text-body-1--font-weight: 400;
+  --text-body-2: 16px;
+  --text-body-2--line-height: 150%;
+  --text-body-2--letter-spacing: 0;
+  --text-body-2--font-weight: 400;
+  --text-body-3: 14px;
+  --text-body-3--line-height: 150%;
+  --text-body-3--letter-spacing: 0;
+  --text-body-3--font-weight: 400;
+  --text-body-4: 12px;
+  --text-body-4--line-height: 150%;
+  --text-body-4--letter-spacing: 0;
+  --text-body-4--font-weight: 400;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body {
+    min-height: 100%;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
