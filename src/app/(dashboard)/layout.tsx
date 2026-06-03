@@ -34,7 +34,7 @@ export default async function DashboardLayout({
   const hasSession = await hasAdminSessionTokens();
   const shellUser = await getAdminShellUser().catch((error) => {
     if (isAdminAuthError(error)) {
-      redirect('/');
+      redirect('/auth/signout?callbackUrl=/');
     }
 
     return error;

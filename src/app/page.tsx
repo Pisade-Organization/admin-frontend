@@ -3,22 +3,19 @@ import AdminGoogleSignInButton from '@/app/AdminGoogleSignInButton';
 import { AdminPageErrorState, AdminStateCard } from '@/shared/components/admin-state';
 import {
   getAdminShellUser,
-  hasAdminSessionTokens,
   isAdminAuthError,
 } from '@/shared/lib/adminApi';
 
 export default async function Home() {
-  const hasSession = await hasAdminSessionTokens();
-
   try {
     const shellUser = await getAdminShellUser();
 
-    if (shellUser || hasSession) {
+    if (shellUser) {
       redirect('/overview');
     }
   } catch (error) {
-    if (hasSession) {
-      redirect('/overview');
+    if (isAdminAuthError(error)) {
+      redirect('/auth/signout?callbackUrl=/');
     }
 
     if (!isAdminAuthError(error)) {
