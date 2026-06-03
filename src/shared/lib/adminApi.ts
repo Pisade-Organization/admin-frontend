@@ -136,15 +136,23 @@ async function refreshAdminAccessToken() {
     });
   }
 
-  const payload = (await response.json()) as
-    | { success?: boolean; data?: { access_token?: string } }
-    | { access_token?: string };
+  const payload = (await response.json()) as unknown;
 
-  const accessToken = 'data' in payload
-    ? payload.data?.access_token?.trim()
-    : payload.access_token?.trim();
+  if (typeof payload !== 'object' || payload === null) {
+    return null;
+  }
 
-  return accessToken || null;
+  if ('data' in payload) {
+    const data = payload as { data?: { access_token?: string } };
+    return data.data?.access_token?.trim() || null;
+  }
+
+  if ('access_token' in payload) {
+    const flat = payload as { access_token?: string };
+    return flat.access_token?.trim() || null;
+  }
+
+  return null;
 }
 
 async function getAdminRefreshToken() {
