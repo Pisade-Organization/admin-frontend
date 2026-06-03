@@ -132,7 +132,30 @@ export async function fetchAdminApi<T>(
     });
   }
 
-  const payload = (await response.json()) as ApiResponse<T>;
+  let payload: ApiResponse<T>;
+
+  try {
+    payload = (await response.json()) as ApiResponse<T>;
+  } catch (error) {
+    const message =
+      error instanceof Error && error.message.trim()
+        ? error.message
+        : 'Backend returned a non-JSON response.';
+
+    logAdminRequestFailure('fetchAdminApi', url, {
+      message,
+      error,
+      hasAccessToken: Boolean(accessToken),
+      method,
+    });
+
+    throw createAdminApiError({
+      message,
+      status: 502,
+      code: 'ADMIN_INVALID_RESPONSE',
+    });
+  }
+
   console.info(`[admin] fetchAdminApi success`, {
     url,
     method,
@@ -146,12 +169,33 @@ export async function fetchPublicApi<T>(path: string): Promise<T> {
   const url = `${getBackendBaseUrl()}${path}`;
   console.info(`[admin] fetchPublicApi start`, { url, method: 'GET' });
 
-  const response = await fetch(url, {
-    cache: 'no-store',
-    headers: {
-      Accept: 'application/json',
-    },
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(url, {
+      cache: 'no-store',
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error && error.message.trim()
+        ? error.message
+        : 'Backend request failed before a response was received.';
+
+    logAdminRequestFailure('fetchPublicApi', url, {
+      message,
+      error,
+      method: 'GET',
+    });
+
+    throw createAdminApiError({
+      message,
+      status: 503,
+      code: 'ADMIN_BACKEND_UNREACHABLE',
+    });
+  }
 
   if (!response.ok) {
     logAdminRequestFailure('fetchPublicApi', url, {
@@ -167,7 +211,29 @@ export async function fetchPublicApi<T>(path: string): Promise<T> {
     });
   }
 
-  const payload = (await response.json()) as ApiResponse<T>;
+  let payload: ApiResponse<T>;
+
+  try {
+    payload = (await response.json()) as ApiResponse<T>;
+  } catch (error) {
+    const message =
+      error instanceof Error && error.message.trim()
+        ? error.message
+        : 'Backend returned a non-JSON response.';
+
+    logAdminRequestFailure('fetchPublicApi', url, {
+      message,
+      error,
+      method: 'GET',
+    });
+
+    throw createAdminApiError({
+      message,
+      status: 502,
+      code: 'ADMIN_INVALID_RESPONSE',
+    });
+  }
+
   console.info(`[admin] fetchPublicApi success`, {
     url,
     method: 'GET',
@@ -205,14 +271,35 @@ async function refreshAdminAccessToken() {
     return null;
   }
 
-  const response = await fetch(`${getBackendBaseUrl()}/auth/refresh`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      Authorization: `Bearer ${refreshToken}`,
-    },
-    cache: 'no-store',
-  });
+  const refreshUrl = `${getBackendBaseUrl()}/auth/refresh`;
+  let response: Response;
+
+  try {
+    response = await fetch(refreshUrl, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${refreshToken}`,
+      },
+      cache: 'no-store',
+    });
+  } catch (error) {
+    const message =
+      error instanceof Error && error.message.trim()
+        ? error.message
+        : 'Token refresh failed before a response was received.';
+
+    logAdminRequestFailure('refreshAdminAccessToken', refreshUrl, {
+      message,
+      error,
+    });
+
+    throw createAdminApiError({
+      message,
+      status: 503,
+      code: 'ADMIN_BACKEND_UNREACHABLE',
+    });
+  }
 
   if (!response.ok) {
     throw createAdminApiError({
@@ -221,7 +308,13 @@ async function refreshAdminAccessToken() {
     });
   }
 
-  const payload = (await response.json()) as unknown;
+  let payload: unknown;
+
+  try {
+    payload = await response.json();
+  } catch {
+    return null;
+  }
 
   if (typeof payload !== 'object' || payload === null) {
     return null;
