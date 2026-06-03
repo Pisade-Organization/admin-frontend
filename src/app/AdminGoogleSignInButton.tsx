@@ -181,7 +181,7 @@ export default function AdminGoogleSignInButton() {
         <button
           type="button"
           onClick={handleGooglePopup}
-          disabled={isLoading || !isScriptReady || !clientId}
+          disabled={isLoading}
           className="inline-flex min-h-12 items-center justify-center gap-3 rounded-2xl bg-deep-royal-indigo-500 px-4 py-3 text-label-3 text-white transition hover:bg-deep-royal-indigo-600 disabled:cursor-not-allowed disabled:bg-deep-royal-indigo-200"
         >
           <GoogleMark />
