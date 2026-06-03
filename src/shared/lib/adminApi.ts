@@ -96,6 +96,12 @@ export async function fetchAdminApi<T>(
         ? error.message
         : 'Backend request failed before a response was received.';
 
+    logAdminRequestFailure('fetchAdminApi', `${getBackendBaseUrl()}${path}`, {
+      message,
+      error,
+      hasAccessToken: Boolean(accessToken),
+    });
+
     throw createAdminApiError({
       message,
       status: 503,
@@ -104,6 +110,12 @@ export async function fetchAdminApi<T>(
   }
 
   if (!response.ok) {
+    logAdminRequestFailure('fetchAdminApi', `${getBackendBaseUrl()}${path}`, {
+      status: response.status,
+      message: await getApiErrorMessage(response),
+      hasAccessToken: Boolean(accessToken),
+    });
+
     throw createAdminApiError({
       message: await getApiErrorMessage(response),
       status: response.status,
@@ -211,6 +223,17 @@ function logAdminShellError(scope: string, error: unknown) {
       : { value: error };
 
   console.error(`[admin] ${scope} failed`, details);
+}
+
+export function logAdminRequestFailure(
+  scope: string,
+  url: string,
+  details: Record<string, unknown>,
+) {
+  console.error(`[admin] ${scope} request failed`, {
+    url,
+    ...details,
+  });
 }
 
 async function getApiErrorMessage(response: Response) {

@@ -115,7 +115,15 @@ export async function getTutorApplications(
 
     const payload = (await response.json()) as ApiResponse<TutorApplicationsPayload>;
     return payload.data;
-  } catch {
+  } catch (error) {
+    logAdminRequestFailure(
+      'getTutorApplications',
+      `${getBackendBaseUrl()}/v1/admin/applications?${params.toString()}`,
+      {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        error,
+      },
+    );
     return null;
   }
 }
@@ -178,3 +186,4 @@ export function getInitials(fullName: string) {
     .join('')
     .toUpperCase();
 }
+import { logAdminRequestFailure } from '@/shared/lib/adminApi';

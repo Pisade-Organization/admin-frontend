@@ -31,7 +31,15 @@ export async function getOverviewHighlights(): Promise<OverviewHighlightsResult>
 
     const payload = (await response.json()) as ApiResponse<OverviewHighlights>;
     return { kind: 'success', data: payload.data };
-  } catch {
+  } catch (error) {
+    logAdminRequestFailure(
+      'getOverviewHighlights',
+      `${getBackendBaseUrl()}/v1/admin/overview/highlights`,
+      {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        error,
+      },
+    );
     return { kind: 'error', data: null };
   }
 }
@@ -66,3 +74,4 @@ export function formatInteger(value: number | null | undefined) {
 
   return new Intl.NumberFormat('en-US').format(value);
 }
+import { logAdminRequestFailure } from '@/shared/lib/adminApi';
