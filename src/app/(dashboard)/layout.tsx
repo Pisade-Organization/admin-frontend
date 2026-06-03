@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
+import { AdminPageErrorState } from '@/shared/components/admin-state';
 import MobileDashboardHeader from '@/shared/components/layout/MobileDashboardHeader';
 import Sidebar, { type SidebarItem } from '@/shared/components/layout/Sidebar';
+import { AdminApiError } from '@/shared/lib/adminApi';
 import { getAdminShellUser, isAdminAuthError } from '@/shared/lib/adminApi';
 
 const navigationItems: SidebarItem[] = [
@@ -30,11 +32,26 @@ export default async function DashboardLayout({
       redirect('/');
     }
 
-    throw error;
+    return error;
   });
 
   if (!shellUser) {
     redirect('/');
+  }
+
+  if (shellUser instanceof Error) {
+    const description =
+      shellUser instanceof AdminApiError
+        ? shellUser.message
+        : 'The admin shell could not verify the current session. Check backend connectivity and try again.';
+
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-stone-100 px-4 py-12">
+        <div className="w-full max-w-2xl">
+          <AdminPageErrorState description={description} />
+        </div>
+      </main>
+    );
   }
 
   return (
