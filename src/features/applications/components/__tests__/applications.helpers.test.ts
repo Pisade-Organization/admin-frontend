@@ -2,7 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 
 import {
+  buildApplicationDetailHref,
   buildApplicationsHref,
+  buildApplicationsReturnHref,
   getApplicationsFlashMessage,
 } from '../applications.helpers.ts';
 
@@ -29,6 +31,32 @@ test('buildApplicationsHref removes success params by default', () => {
       {},
     ),
     '/applications?q=ann&sort=oldest&status=APPROVED&page=4',
+  );
+});
+
+test('buildApplicationDetailHref preserves list state in the detail url', () => {
+  assert.equal(
+    buildApplicationDetailHref('tutor-1', {
+      q: 'ann',
+      sort: 'oldest',
+      status: 'REVIEWING',
+      page: '3',
+    }),
+    '/applications/tutor-1?q=ann&sort=oldest&status=REVIEWING&page=3',
+  );
+});
+
+test('buildApplicationsReturnHref removes flash params while preserving filters', () => {
+  assert.equal(
+    buildApplicationsReturnHref({
+      q: 'ann',
+      sort: 'oldest',
+      status: 'REVIEWING',
+      page: '3',
+      success: 'approved',
+      error: 'Could%20not%20update%20tutor%20status',
+    }),
+    '/applications?q=ann&sort=oldest&status=REVIEWING&page=3',
   );
 });
 

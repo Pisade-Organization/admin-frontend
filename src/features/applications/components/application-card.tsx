@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import Avatar from '@/shared/components/base/Avatar';
 import Typography from '@/shared/components/base/Typography';
 import { Ellipsis, GraduationCap, Star, Users } from 'lucide-react';
@@ -12,6 +13,7 @@ import { TutorStatus } from './applications.types';
 type ApplicationCardProps = {
   application: TutorApplicationCard;
   currentUrl: string;
+  detailHref: string;
   onUpdateStatus: (formData: FormData) => Promise<void>;
 };
 
@@ -61,6 +63,7 @@ function ActionButton({
 export default function ApplicationCard({
   application,
   currentUrl,
+  detailHref,
   onUpdateStatus,
 }: ApplicationCardProps) {
   const isProcessing = application.status === 'REVIEWING';
@@ -69,27 +72,32 @@ export default function ApplicationCard({
   return (
     <article className="flex flex-col gap-4 rounded-[24px] border border-stone-200 bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] lg:p-6">
       <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <Avatar
-            src={application.avatarUrl}
-            alt={application.fullName}
-            name={application.fullName}
-            sizeClassName="h-16 w-16"
-            textClassName="text-label-2"
-          />
+        <Link
+          href={detailHref}
+          className="min-w-0 flex-1 rounded-[20px] transition hover:bg-neutral-25 focus:outline-none focus:ring-2 focus:ring-deep-royal-indigo-300"
+        >
+          <div className="flex items-center gap-4 p-1">
+            <Avatar
+              src={application.avatarUrl}
+              alt={application.fullName}
+              name={application.fullName}
+              sizeClassName="h-16 w-16"
+              textClassName="text-label-2"
+            />
 
-          <div className="flex flex-col gap-1">
-            <Typography as="h3" variant={{ base: 'title-4', lg: 'title-3' }} color="neutral-800">
-              {application.fullName}
-            </Typography>
-            <Typography variant={{ base: 'body-3' }} color="neutral-500">
-              {application.subject}
-            </Typography>
-            <Typography variant={{ base: 'label-3' }} color="neutral-700">
-              {formatCurrency(application.baseRate)} / lesson
-            </Typography>
+            <div className="flex min-w-0 flex-col gap-1">
+              <Typography as="h3" variant={{ base: 'title-4', lg: 'title-3' }} color="neutral-800">
+                {application.fullName}
+              </Typography>
+              <Typography variant={{ base: 'body-3' }} color="neutral-500">
+                {application.subject}
+              </Typography>
+              <Typography variant={{ base: 'label-3' }} color="neutral-700">
+                {formatCurrency(application.baseRate)} / lesson
+              </Typography>
+            </div>
           </div>
-        </div>
+        </Link>
 
         {isApproved ? (
           <details className="relative">
@@ -121,43 +129,48 @@ export default function ApplicationCard({
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-3 rounded-[20px] bg-neutral-25 p-4">
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 text-neutral-500">
-            <Star className="h-4 w-4" />
-            <Typography variant={{ base: 'label-4' }} color="neutral-500">
-              Rating
+      <Link
+        href={detailHref}
+        className="block rounded-[20px] transition hover:bg-neutral-25 focus:outline-none focus:ring-2 focus:ring-deep-royal-indigo-300"
+      >
+        <div className="grid grid-cols-3 gap-3 rounded-[20px] bg-neutral-25 p-4">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2 text-neutral-500">
+              <Star className="h-4 w-4" />
+              <Typography variant={{ base: 'label-4' }} color="neutral-500">
+                Rating
+              </Typography>
+            </div>
+            <Typography variant={{ base: 'title-4' }} color="neutral-800">
+              {application.avgRating.toFixed(1)}
             </Typography>
           </div>
-          <Typography variant={{ base: 'title-4' }} color="neutral-800">
-            {application.avgRating.toFixed(1)}
-          </Typography>
-        </div>
 
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 text-neutral-500">
-            <Users className="h-4 w-4" />
-            <Typography variant={{ base: 'label-4' }} color="neutral-500">
-              Students
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2 text-neutral-500">
+              <Users className="h-4 w-4" />
+              <Typography variant={{ base: 'label-4' }} color="neutral-500">
+                Students
+              </Typography>
+            </div>
+            <Typography variant={{ base: 'title-4' }} color="neutral-800">
+              {formatCompactNumber(application.studentsCount)}
             </Typography>
           </div>
-          <Typography variant={{ base: 'title-4' }} color="neutral-800">
-            {formatCompactNumber(application.studentsCount)}
-          </Typography>
-        </div>
 
-        <div className="flex flex-col gap-1">
-          <div className="flex items-center gap-2 text-neutral-500">
-            <GraduationCap className="h-4 w-4" />
-            <Typography variant={{ base: 'label-4' }} color="neutral-500">
-              Lessons
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2 text-neutral-500">
+              <GraduationCap className="h-4 w-4" />
+              <Typography variant={{ base: 'label-4' }} color="neutral-500">
+                Lessons
+              </Typography>
+            </div>
+            <Typography variant={{ base: 'title-4' }} color="neutral-800">
+              {formatCompactNumber(application.lessonsCount)}
             </Typography>
           </div>
-          <Typography variant={{ base: 'title-4' }} color="neutral-800">
-            {formatCompactNumber(application.lessonsCount)}
-          </Typography>
         </div>
-      </div>
+      </Link>
 
       {isProcessing ? (
         <div className="flex gap-3">

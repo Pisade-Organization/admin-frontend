@@ -1,3 +1,4 @@
+import { fetchPublicApi, logAdminRequestFailure } from '@/shared/lib/adminApi';
 import { TutorStatus } from './applications.types';
 
 export type TutorApplicationCard = {
@@ -24,6 +25,104 @@ export type TutorApplicationsPayload = {
   currentStatus: TutorStatus | null;
   currentSort: ApplicationSort;
   currentQuery: string;
+};
+
+export type TutorApplicationDetail = {
+  id: string;
+  userId: string;
+  status: TutorStatus;
+  joinedAt: string;
+  fullName: string;
+  email: string | null;
+  avatarUrl: string | null;
+  subject: string | null;
+  baseRate: number;
+  stats: {
+    avgRating: number;
+    studentsCount: number;
+    lessonsCount: number;
+  };
+  steps: {
+    stepOne: {
+      fullName: string;
+      firstName: string | null;
+      lastName: string | null;
+      countryOfBirth: string | null;
+      nationality: string | null;
+      countryCode: string | null;
+      phoneNumber: string | null;
+      email: string | null;
+      isOver18: boolean | null;
+      subject: string | null;
+      languages: Array<{
+        id: string;
+        name: string | null;
+        level: string | null;
+      }>;
+    };
+    stepTwo: {
+      avatarUrl: string | null;
+    };
+    stepThree: {
+      hasTeachingCertificate: boolean;
+      certifications: Array<{
+        id: string;
+        certificationName: string | null;
+        certifyingOrganization: string | null;
+        issuedBy: string | null;
+        description: string | null;
+        startYear: number | null;
+        endYear: number | null;
+        certificateFileUrl: string | null;
+      }>;
+    };
+    stepFour: {
+      hasDiploma: boolean;
+      diplomas: Array<{
+        id: string;
+        universityName: string | null;
+        degree: string | null;
+        fieldOfStudy: string | null;
+        specialization: string | null;
+        yearStart: number | null;
+        yearEnd: number | null;
+        currentlyStudying: boolean;
+        diplomaFileUrl: string | null;
+      }>;
+    };
+    stepFive: {
+      catchyHeadline: string | null;
+      introduceYourself: string | null;
+      teachingExperience: string | null;
+      motivatePotentialStudents: string | null;
+    };
+    stepSix: {
+      videoUrl: string | null;
+      thumbnailUrl: string | null;
+    };
+    stepSeven: {
+      timezone: string | null;
+      availabilities: Array<{
+        id: string;
+        dayOfWeek: number | null;
+        startTime: string | null;
+        endTime: string | null;
+        timezone: string | null;
+      }>;
+    };
+    stepEight: {
+      lessonPrice: number;
+      withdrawalMethod: string | null;
+      withdrawalPhoneNumber: string | null;
+      bankName: string | null;
+      bankAccountNumber: string | null;
+    };
+    stepNine: {
+      documentType: string | null;
+      idCardUrl: string | null;
+      passportUrl: string | null;
+    };
+  };
 };
 
 type ApiResponse<T> = {
@@ -128,6 +227,12 @@ export async function getTutorApplications(
   }
 }
 
+export async function getTutorApplicationDetail(
+  tutorId: string,
+): Promise<TutorApplicationDetail> {
+  return fetchPublicApi<TutorApplicationDetail>(`/v1/admin/applications/${tutorId}`);
+}
+
 export function formatStatusLabel(status: TutorStatus) {
   switch (status) {
     case 'REVIEWING':
@@ -186,4 +291,3 @@ export function getInitials(fullName: string) {
     .join('')
     .toUpperCase();
 }
-import { logAdminRequestFailure } from '@/shared/lib/adminApi';

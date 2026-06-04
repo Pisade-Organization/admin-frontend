@@ -16,6 +16,7 @@ import {
   parseApplicationStatus,
 } from './applications.data';
 import {
+  buildApplicationDetailHref,
   buildApplicationsHref,
   getApplicationsFlashMessage,
 } from './applications.helpers';
@@ -229,6 +230,7 @@ export async function ApplicationsPage({ searchParams }: ApplicationsPageProps) 
                 key={application.id}
                 application={application}
                 currentUrl={currentUrl}
+                detailHref={buildApplicationDetailHref(application.id, searchParams)}
                 onUpdateStatus={updateTutorStatus}
               />
             ))}

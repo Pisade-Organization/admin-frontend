@@ -5,6 +5,7 @@ type ApplicationsSearchParamsLike = {
   page?: string;
   success?: string;
   error?: string;
+  notice?: string;
 };
 
 export type ApplicationsFlashMessage = {
@@ -61,6 +62,48 @@ export function buildApplicationsHref(
   const queryString = params.toString();
 
   return queryString ? `/applications?${queryString}` : '/applications';
+}
+
+export function buildApplicationDetailHref(
+  tutorId: string,
+  searchParams: ApplicationsSearchParamsLike,
+) {
+  const params = new URLSearchParams();
+  const q = normalizeParam(searchParams.q);
+  const sort = normalizeParam(searchParams.sort);
+  const status = normalizeParam(searchParams.status);
+  const page = normalizeParam(searchParams.page);
+
+  if (q) {
+    params.set('q', q);
+  }
+
+  if (sort) {
+    params.set('sort', sort);
+  }
+
+  if (status) {
+    params.set('status', status);
+  }
+
+  if (page) {
+    params.set('page', page);
+  }
+
+  const queryString = params.toString();
+  return queryString
+    ? `/applications/${tutorId}?${queryString}`
+    : `/applications/${tutorId}`;
+}
+
+export function buildApplicationsReturnHref(
+  searchParams: ApplicationsSearchParamsLike,
+) {
+  return buildApplicationsHref(searchParams, {
+    success: undefined,
+    error: undefined,
+    notice: undefined,
+  });
 }
 
 export function getApplicationsFlashMessage(
